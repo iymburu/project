@@ -38,5 +38,16 @@ class AuthViewModel (var navController: NavController, var context: Context){
             }
         }
         }
+     fun Login(email: String,pass: String){
+        mAuth.signInWithEmailAndPassword(email,pass).addOnCompleteListener {
+            if (it.isSuccessful){
+                Toast.makeText(context,"User logged in successfully", Toast.LENGTH_LONG).show()
+                navController.navigate(ROUTE_HOME)
+            }
+            else {
+                Toast.makeText(context,"Wrong email or password. Try again", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     }
 
