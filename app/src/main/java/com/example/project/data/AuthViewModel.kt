@@ -38,7 +38,7 @@ class AuthViewModel (var navController: NavController, var context: Context){
             }
         }
         }
-     fun Login(email: String,pass: String){
+    fun Login(email: String,pass: String){
         mAuth.signInWithEmailAndPassword(email,pass).addOnCompleteListener {
             if (it.isSuccessful){
                 Toast.makeText(context,"User logged in successfully", Toast.LENGTH_LONG).show()
@@ -50,4 +50,5 @@ class AuthViewModel (var navController: NavController, var context: Context){
         }
     }
     }
+
 

@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
@@ -50,6 +51,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.project.R
+import com.example.project.data.AuthViewModel
 import com.example.project.navigation.ROUTE_REGISTER
 import com.example.project.ui.theme.PurpleGrey80
 import com.example.project.ui.theme.myblue
@@ -71,6 +73,7 @@ fun Loginscreen(navController: NavHostController) {
         }
         var email by remember { mutableStateOf(TextFieldValue("")) }
         var pass by remember { mutableStateOf(TextFieldValue("")) }
+        var context= LocalContext.current
 
         Spacer(modifier = Modifier.height(120.dp))
 
@@ -89,7 +92,9 @@ fun Loginscreen(navController: NavHostController) {
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) }
         )
         Spacer(modifier= Modifier.height(20.dp))
-        Button({/*TODO*/},modifier= Modifier.width(300.dp),
+        Button({val mylogin= AuthViewModel(navController,context)
+               mylogin.Login(email.text.trim(),pass.text.trim())},
+            modifier= Modifier.width(300.dp),
            colors=ButtonDefaults.buttonColors(Color.Blue) ) {
             Text("Login",
                 color = Color.White,
