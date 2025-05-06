@@ -3,6 +3,7 @@ package com.example.project.ui.theme.screens.expense
 import android.R.attr.text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +62,7 @@ fun AddExpenseScreen(modifier: Modifier = Modifier) {
 //                })
 //        }
 //    }
-    Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color.White)){
@@ -67,15 +70,22 @@ fun AddExpenseScreen(modifier: Modifier = Modifier) {
         var amount by remember { mutableStateOf(TextFieldValue("")) }
         val date by remember { mutableLongStateOf(0L) }
         val dateDialogVisibility by remember { mutableStateOf(false) }
-        Image(painter=painterResource(id=R.drawable.menu_icon), contentDescription = "menu",modifier= Modifier.align(
-            Alignment.TopEnd as Alignment.Horizontal
-        ))
-        Card(modifier = Modifier
+
+
+
+
+        Box(modifier = Modifier
             .fillMaxWidth()
             .background(color = myblue)
             .padding(64.dp)) {
 
-            Row { Text("       Add Expense                        ", fontFamily = FontFamily.Cursive, fontSize = 30.sp,modifier = Modifier.background(color = myblue), color = Color.White) }
+
+            Row { Text("       Add Expense                        ", fontFamily = FontFamily.Cursive, fontSize = 30.sp,modifier = Modifier.background(color = myblue), color = Color.White)
+                Image(painter=painterResource(id=R.drawable.menu_icon), contentDescription = "menu",modifier= Modifier
+                    .clickable {/*TODO*/ }
+                    )
+
+                }
 
         }
         Spacer(modifier= Modifier.height(70.dp))
@@ -83,7 +93,7 @@ fun AddExpenseScreen(modifier: Modifier = Modifier) {
             .shadow(16.dp)
             .background(color = Color.White, shape = RoundedCornerShape(6.dp))
             .padding(20.dp)
-
+            .align(Alignment.CenterHorizontally)
             .verticalScroll(rememberScrollState())) {
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -99,8 +109,6 @@ fun AddExpenseScreen(modifier: Modifier = Modifier) {
 
 
 
-
-        
 
 
 }
