@@ -93,17 +93,7 @@ import java.util.Locale
 @Composable
 fun AddExpenseScreen(navController: NavHostController) {
     val menuExpanded = remember { mutableStateOf(false) }
-//    Surface(modifier = Modifier.fillMaxSize()) {
-//        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-//            val topBar = createRef()
-//            Image(
-//                painter = painterResource(id = R.drawable.bar), contentDescription = "bar",
-//                modifier = Modifier.fillMaxWidth().constrainAs(topBar) {
-//                    top.linkTo(parent.top)
-//                    start.linkTo(parent.start)
-//                    end.linkTo(parent.end)
-//                })
-//        }
+//
 
 
 

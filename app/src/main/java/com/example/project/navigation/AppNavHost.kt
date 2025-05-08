@@ -19,7 +19,7 @@ import com.example.project.ui.theme.screens.register.RegisterScreen
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier,
                navController: NavHostController= rememberNavController(),
-               startDestination:String= ROUTE_HOME) {
+               startDestination:String= ROUTE_ADD) {
     NavHost(navController = navController, modifier = modifier, startDestination = startDestination) {
         composable(ROUTE_LOGIN){
             Loginscreen(navController)

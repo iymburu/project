@@ -58,11 +58,14 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.project.R
+import com.example.project.navigation.ROUTE_HOME
 import com.example.project.ui.theme.myblue
 
 @Composable
-fun AddIncome(modifier: Modifier = Modifier) {
+fun AddIncome(navController : NavHostController) {
     val menuExpanded = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -85,7 +88,7 @@ fun AddIncome(modifier: Modifier = Modifier) {
 
             }
             Image(painter=painterResource(id= R.drawable.back_arrow), contentDescription = "menu",modifier= Modifier
-                .clickable { return@clickable }
+                .clickable(onClick = { navController.navigate(ROUTE_HOME) })
                 .align(Alignment.TopStart)
             )
 
@@ -175,7 +178,9 @@ fun AddIncome(modifier: Modifier = Modifier) {
             Button({/*TODO*/}, modifier = Modifier.fillMaxWidth()) {
                 Text(" Add Income ")
 
-            }
+                }
+
+
         }
 
     }
@@ -186,6 +191,7 @@ fun AddIncome(modifier: Modifier = Modifier) {
 
 
 }
+
 
 
 
@@ -233,5 +239,5 @@ fun IncomeDropDown(listOfItems: List<String>,onItemSelected:(item: String )-> Un
 @Preview
 @Composable
 private fun Income() {
-    AddIncome()
+    AddIncome(rememberNavController())
 }
