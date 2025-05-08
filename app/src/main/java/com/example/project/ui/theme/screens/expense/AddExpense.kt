@@ -4,6 +4,9 @@ import android.R.attr.text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,20 +24,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -47,6 +61,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -60,6 +77,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -67,10 +85,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.project.R
 import com.example.project.ui.theme.myblue
 import java.nio.file.WatchEvent
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(navController: NavHostController) {
-    val menuExpanded by remember { mutableStateOf(false) }
+    val menuExpanded = remember { mutableStateOf(false) }
 //    Surface(modifier = Modifier.fillMaxSize()) {
 //        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
 //            val topBar = createRef()
@@ -82,27 +104,17 @@ fun AddExpenseScreen(navController: NavHostController) {
 //                    end.linkTo(parent.end)
 //                })
 //        }
-    DropdownMenu(expanded = menuExpanded,
-        onDismissRequest = {}) {
-        DropdownMenuItem(
-            text = {Text("Profile")},
-            onClick = {/*TODO*/}
-        )
-        DropdownMenuItem(
-            text={Text("Settings")},
-            onClick = {/*TODO*/}
-        )
-    }
+
 
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.White)){
+            .background(color = Color.White)
+            ){
         val name = remember { mutableStateOf("") }
         val amount = remember { mutableStateOf(TextFieldValue("")) }
-        val date = remember { mutableLongStateOf(0L) }
-        val dateDialogVisibility by remember { mutableStateOf(false) }
+
 
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -122,10 +134,23 @@ fun AddExpenseScreen(navController: NavHostController) {
 
                 Spacer(modifier= Modifier.width(90.dp))
                 Image(painter=painterResource(id= R.drawable.menu_icon), contentDescription = "menu",modifier= Modifier
-                    .clickable {/*TODO*/ }
+                    .clickable {
+
+                    }
                     .align(Alignment.TopEnd)
                 )
 
+        }
+        DropdownMenu(expanded = menuExpanded.value,
+            onDismissRequest = {menuExpanded.value= false}) {
+            DropdownMenuItem(
+                text = {Text("Profile")},
+                onClick = {/*TODO*/}
+            )
+            DropdownMenuItem(
+                text={Text("Settings")},
+                onClick = {/*TODO*/}
+            )
         }
 
 
@@ -151,6 +176,8 @@ fun AddExpenseScreen(navController: NavHostController) {
                 "Transport",
                 "Shopping",
                 "Gifts",
+                "Netflix",
+                "Spotify",
                 "Other"
             ), onItemSelected = {
                 name.value=it
@@ -162,7 +189,7 @@ fun AddExpenseScreen(navController: NavHostController) {
                 onValueChange = {},
                 textStyle = TextStyle(color = Color.Black),
                 visualTransformation = {text ->
-                    val out ="Kshs" + text.text
+                    val out ="$" + text.text
                     val currencyOffsetTranslator = object : OffsetMapping{
                         override fun originalToTransformed(offset: Int): Int {
                             return offset + 1
@@ -185,10 +212,14 @@ fun AddExpenseScreen(navController: NavHostController) {
                     disabledPlaceholderColor = Color.Black,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black,))
+            Spacer(modifier = Modifier.height(20.dp))
+            Text("Date", fontSize = 12.sp, color = Color.Black)
+            Spacer(modifier = Modifier.size(10.dp))
+            DatePickerDocked()
 
-
-            Button({/*TODO*/}) {
-                Text(" AddExpense ")
+            Spacer(modifier = Modifier.height(40.dp))
+            Button({/*TODO*/}, modifier = Modifier.fillMaxWidth()) {
+                Text(" Add Expense ")
 
             }
         }
@@ -201,6 +232,8 @@ fun AddExpenseScreen(navController: NavHostController) {
 
 
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -240,6 +273,115 @@ fun ExpenseDropDown(listOfItems: List<String>,onItemSelected:(item: String )-> U
         }
     }
 
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerDocked() {
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillisToDate(it)
+    } ?: ""
+
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedDate,
+            onValueChange = { },
+            label = { Text("Select date") },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { showDatePicker = !showDatePicker }) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Select date"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .verticalScroll(rememberScrollState()),
+            shape =  RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Black,
+                disabledPlaceholderColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black)
+
+        )
+
+        if (showDatePicker) {
+            Popup(
+                onDismissRequest = { showDatePicker = false },
+                alignment = Alignment.TopStart
+            ) {
+                Box(
+                    modifier = Modifier
+                        .offset(y = 23.dp)
+                        .shadow(elevation = 4.dp)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(13.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    DatePicker(
+                        state = datePickerState,
+                        showModeToggle = false
+                    )
+                }
+            }
+        }
+    }
+}
+//@Composable
+//fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
+//    var selectedDate by remember { mutableStateOf<Long?>(null) }
+//    var showModal by remember { mutableStateOf(false) }
+//
+//    OutlinedTextField(
+//        value = selectedDate?.let { convertMillisToDate(it) } ?: "",
+//        onValueChange = { },
+//        label = { Text("DOB") },
+//        placeholder = { Text("MM/DD/YYYY") },
+//        trailingIcon = {
+//            Icon(Icons.Default.DateRange, contentDescription = "Select date")
+//        },
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .pointerInput(selectedDate) {
+//                awaitEachGesture {
+//                    // Modifier.clickable doesn't work for text fields, so we use Modifier.pointerInput
+//                    // in the Initial pass to observe events before the text field consumes them
+//                    // in the Main pass.
+//                    awaitFirstDown(pass = PointerEventPass.Initial)
+//                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+//                    if (upEvent != null) {
+//                        showModal = true
+//                    }
+//                }
+//            }
+//    )
+//
+//    if (showModal) {
+//        DatePickerModal(
+//            onDateSelected = {
+//                val it = null
+//                selectedDate = it
+//            },
+//            onDismiss = { showModal = false }
+//        )
+//    }
+//}
+
+
+
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    return formatter.format(Date(millis))
 }
 @Preview
 @Composable

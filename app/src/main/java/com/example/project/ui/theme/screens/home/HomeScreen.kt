@@ -30,9 +30,7 @@ import java.nio.file.WatchEvent
 @Composable
 fun Homescreen(navController: NavHostController) {
     Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.fillMaxSize().background(color = Color.White )){
-        Spacer(modifier = Modifier.height(60.dp))
-        Text("HOME")
-        Card(modifier = Modifier.background(color = white, shape = RoundedCornerShape(4.dp))) {  }
+//Top Navigation bar
 
     }
 

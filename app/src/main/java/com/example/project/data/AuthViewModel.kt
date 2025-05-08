@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.project.models.User
 import com.example.project.navigation.ROUTE_HOME
+import com.example.project.navigation.ROUTE_LOGIN
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -49,6 +50,14 @@ class AuthViewModel (var navController: NavController, var context: Context){
             }
         }
     }
+    fun logout(){
+        mAuth.signOut()
+        navController.navigate(ROUTE_LOGIN)
     }
+    fun isloggedin():Boolean{
+        return mAuth.currentUser !=null
+    }
+
+}
 
 
