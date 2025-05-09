@@ -1,6 +1,7 @@
 package com.example.project.ui.theme.screens.expense
 
 import android.R.attr.text
+import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +26,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -39,6 +45,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -83,6 +90,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.project.R
+import com.example.project.navigation.ROUTE_HOME
 import com.example.project.ui.theme.myblue
 import java.nio.file.WatchEvent
 import java.text.SimpleDateFormat
@@ -123,12 +131,7 @@ fun AddExpenseScreen(navController: NavHostController) {
                 )
 
                 Spacer(modifier= Modifier.width(90.dp))
-                Image(painter=painterResource(id= R.drawable.menu_icon), contentDescription = "menu",modifier= Modifier
-                    .clickable {
-
-                    }
-                    .align(Alignment.TopEnd)
-                )
+              DropdownMenuWithDetails()
 
         }
         DropdownMenu(expanded = menuExpanded.value,
@@ -223,7 +226,58 @@ fun AddExpenseScreen(navController: NavHostController) {
 
 }
 
+@Composable
+fun DropdownMenuWithDetails() {
+    var expanded by remember { mutableStateOf(false) }
 
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+
+    ) {
+        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.align (Alignment.TopEnd)) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            // First section
+            DropdownMenuItem(
+                text = { Text("Profile") },
+                leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+                onClick = { /* Do something... */ }
+            )
+            DropdownMenuItem(
+                text = { Text("Settings") },
+                leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+                onClick = { /* Do something... */ }
+            )
+
+            HorizontalDivider()
+
+            // Second section
+            DropdownMenuItem(
+                text = { Text("Send Feedback") },
+                trailingIcon = { Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null) },
+                onClick = { /* Do something... */ }
+            )
+
+            HorizontalDivider()
+
+            // Third section
+            DropdownMenuItem(
+                text = { Text("About") },
+                leadingIcon = { Icon(Icons.Outlined.Info, contentDescription = null) },
+                onClick = { /* Do something... */ }
+            )
+            DropdownMenuItem(
+                text = { Text("Help") },
+                onClick = { /* Do something... */ }
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
