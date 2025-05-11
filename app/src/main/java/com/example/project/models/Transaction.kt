@@ -1,16 +1,23 @@
 package com.example.project.models
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import java.util.Date
+class Transaction{
+    var id :String =""
+    var amount: Double=0.0
+    var date : String = ""
+    var category:String =""
+    var type: String =""
+   constructor()
+constructor(amount: Double, type:String, category:String, date:String, id: String){
+    this.id=id
+    this.amount=amount
+    this.date=date
+    this.category=category
+    this.type=type
 
-@Entity(tableName = "transactions")
-data class Transaction(
-    @PrimaryKey(autoGenerate = true)
-    val id : Int =0,
-    val amount: Double,
-    val date : String,
-    val Category:String,
-    val Type: String="income"
-){
-constructor(amount: Double , Type:String,Category:String,date:String) :this(0,amount,Type,Category,date)}
+
+}
+}
+class Balance{
+    var current= 0.0
+}
+

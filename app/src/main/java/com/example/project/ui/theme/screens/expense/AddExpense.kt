@@ -1,26 +1,16 @@
 package com.example.project.ui.theme.screens.expense
 
-import android.R.attr.text
-import android.widget.ImageButton
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,16 +24,12 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -51,52 +37,32 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.motionEventSpy
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.project.R
 import com.example.project.data.TransactionModel
-import com.example.project.navigation.ROUTE_HOME
+import com.example.project.navigation.ROUTE_VIEW
 import com.example.project.ui.theme.myblue
-import java.nio.file.WatchEvent
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -104,12 +70,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(navController: NavHostController,
-                     viewModel: TransactionModel= hiltViewModel()
-) {
+) {var context= LocalContext.current
 
     val menuExpanded = remember { mutableStateOf(false) }
 //
-    val transactions by viewModel.allTransactions.collectAsState(initial = emptyList())
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -122,7 +86,7 @@ fun AddExpenseScreen(navController: NavHostController,
             .fillMaxSize()
             .background(color = Color.White)
             ){
-        val category = remember { mutableStateOf("") }
+        var category by remember { mutableStateOf("") }
         var amount by remember { mutableStateOf("") }
         val type by remember { mutableStateOf("expense") }
         Box(modifier = Modifier
@@ -168,19 +132,18 @@ fun AddExpenseScreen(navController: NavHostController,
             Spacer(modifier = Modifier.size(4.dp))
             Text("Category", fontSize = 12.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.size(10.dp))
-            ExpenseDropDown(listOf(
-                "Groceries",
-                "Rent",
-                "Enjoyment",
-                "Transport",
-                "Shopping",
-                "Gifts",
-                "Netflix",
-                "Spotify",
-                "Other"
-            ), onItemSelected = {
-                category.value=it
-            })
+           OutlinedTextField(value = category,
+               onValueChange = {category=it},
+               modifier = Modifier.fillMaxWidth(),
+               shape =  RoundedCornerShape(8.dp),
+               colors = OutlinedTextFieldDefaults.colors(
+
+                   focusedBorderColor = Color.Black,
+                   unfocusedBorderColor = Color.Black,
+                   disabledBorderColor = Color.Black,
+                   disabledPlaceholderColor = Color.Black,
+                   focusedTextColor = Color.Black,
+                   unfocusedTextColor = Color.Black,))
             Spacer(modifier = Modifier.height(20.dp))
             Text("Amount", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
@@ -251,12 +214,11 @@ fun AddExpenseScreen(navController: NavHostController,
                 }
             }
             Spacer(modifier = Modifier.height(40.dp))
-            Button({viewModel.addTransaction(
-                amount = amount.toDouble(),
-                Category = category.toString(),
-                Type = "expense",
-                date = selectedDate
-            )}, modifier = Modifier.fillMaxWidth()) {
+            Button({
+                var transactionRepository = TransactionModel(navController, context = context)
+                transactionRepository.saveTransaction(category.toString(), amount.toDouble(),type,selectedDate)
+                navController.navigate(ROUTE_VIEW)
+            }, modifier = Modifier.fillMaxWidth()) {
                 Text(" Add Expense ")
 
             }

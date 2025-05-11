@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.project.Dao.TransactionDao
 import com.example.project.R
 import androidx.activity.viewModels
 import androidx.cardview.widget.CardView
@@ -74,13 +73,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Dao
-import com.example.project.data.AppDatabase
 import com.example.project.data.TransactionModel
-import com.example.project.data.TransactionModelFactory
-import com.example.project.data.TransactionRepository
 import com.example.project.navigation.ROUTE_ADD
 import com.example.project.navigation.ROUTE_ADD_INCOME
+import com.example.project.navigation.ROUTE_CHART
 import com.example.project.navigation.ROUTE_HOME
 import com.example.project.navigation.ROUTE_VIEW
 import com.example.project.ui.theme.myblue
@@ -89,13 +85,13 @@ import com.google.android.play.core.integrity.p
 
 @Composable
 fun Homescreen(navController: NavHostController,
-               viewModel: TransactionModel = hiltViewModel()
+
 )
 {
 
 
 
-    val balance by viewModel.balance.collectAsState(initial = 0.0)
+
     var expanded by remember { mutableStateOf(false) }
 
 
@@ -128,35 +124,45 @@ fun Homescreen(navController: NavHostController,
 
                }
                Image(
-                   painter = painterResource(id = R.drawable.vert_menu), contentDescription ="menu", modifier = Modifier.align(Alignment.TopEnd).clickable { navController.navigate(ROUTE_VIEW) }
+                   painter = painterResource(id = R.drawable.account), contentDescription ="menu", modifier = Modifier.align(Alignment.TopEnd).clickable { navController.navigate(ROUTE_VIEW) }
                , colorFilter = ColorFilter.tint(color = Color.White))
            }
 
-            Column(modifier = Modifier
-                .constrainAs(card) {
-                    top.linkTo(namerow.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .padding(top = 84.dp, start = 26.dp, end = 16.dp)
-                .shadow(16.dp)
-                .fillMaxWidth()
-                .height(200.dp)
-                .background(color = myblue, shape = RoundedCornerShape(16.dp))
-                .clip(shape = RoundedCornerShape(16.dp))) {
-                Column(modifier = Modifier.padding(top = 10.dp, start = 12.dp)) {
-                    Text("Current Balance", fontSize = 25.sp, fontWeight = FontWeight.Medium, color = Color.White)
-                    Spacer(modifier = Modifier.height(15.dp))
-                Text(text = "Kshs:  ${balance?.toString() ?:"0.00"}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = white, modifier = Modifier.align(Alignment.CenterHorizontally))}
 
-            }
-            Column(modifier= Modifier
+            Column(modifier= Modifier.padding(start = 20.dp,end=20.dp)
                 .constrainAs(list) {
-                    top.linkTo(card.bottom)
+                    top.linkTo(topBar.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .height(250.dp)) {
+                .height(450.dp)) {
+                Spacer(modifier = Modifier.height(60.dp))
+                Button({ROUTE_ADD_INCOME}, modifier = Modifier.fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(shape = RectangleShape, color = myblue),
+                    colors = ButtonDefaults.buttonColors(myblue),
+                ) {
+                    Text("Add Income", fontSize = 20.sp, color =Color.White , modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Button({navController.navigate(ROUTE_ADD)}, modifier = Modifier.fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(shape = RectangleShape, color = myblue),
+                    colors = ButtonDefaults.buttonColors(myblue),
+                ) {
+                    Text("Add Expense", fontSize = 20.sp,color =Color.White, modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button({navController.navigate(ROUTE_VIEW)}, modifier = Modifier.fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .background(shape = RectangleShape, color = myblue),
+                    colors = ButtonDefaults.buttonColors(myblue),
+                ) {
+                    Text("View Transactions", fontSize = 20.sp,color =Color.White, modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+
 
             }
 
@@ -171,28 +177,7 @@ fun Homescreen(navController: NavHostController,
                 ) {
                 Column(modifier = Modifier.align (Alignment.CenterEnd)) {
 
-                    Button({expanded= !expanded}, modifier = Modifier
-                        .clip(shape = RoundedCornerShape(16.dp))
-                        .background(shape = RectangleShape, color = myblue),
-                        colors = ButtonDefaults.buttonColors(myblue),
-                    ) {
-                        Text("+", fontSize = 20.sp, modifier = Modifier.align(Alignment.CenterVertically))
-                    }
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Add Income") },
-                            onClick = {
-                                navController.navigate(ROUTE_ADD_INCOME)
-                            })
 
-                        DropdownMenuItem(
-                            text = { Text("Add Expense") },
-                            onClick = {navController.navigate(ROUTE_ADD) }
-                        )
-                    }
                 }
 
             }
@@ -221,7 +206,8 @@ fun Homescreen(navController: NavHostController,
                     Column(modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 54.dp) ){
-                        Image(painter = painterResource(id=R.drawable.graph_24), contentDescription = "graph", colorFilter = ColorFilter.tint(color = Color.White))
+                        Image(painter = painterResource(id=R.drawable.graph_24), contentDescription = "graph", colorFilter = ColorFilter.tint(color = Color.White), modifier = Modifier.clickable { navController.navigate(
+                            ROUTE_CHART) })
                         }}
 
 

@@ -1,6 +1,5 @@
 package com.example.project.ui.theme.screens.expense
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,18 +73,16 @@ import com.example.project.ui.theme.myblue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddIncome(navController: NavHostController,
-              defaultType: String ="income",
-              viewModel: TransactionModel= hiltViewModel()) {
+           ) {
+    var context= LocalContext.current
     val menuExpanded = remember { mutableStateOf(false) }
 //
-    val transactions by viewModel.allTransactions.collectAsState(initial = emptyList())
+
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
         convertMillisToDate(it)
     } ?: ""
-    val context= LocalContext.current
-
 
 
     Column(
@@ -93,9 +90,9 @@ fun AddIncome(navController: NavHostController,
             .fillMaxSize()
             .background(color = Color.White)
     ){
-        val category = remember { mutableStateOf("") }
+        var category by remember { mutableStateOf("") }
         var amount by remember { mutableStateOf("") }
-        var transactionType by remember { mutableStateOf(defaultType) }
+        var type by remember { mutableStateOf("income") }
         Box(modifier = Modifier
             .fillMaxWidth()
             .background(color = myblue)
@@ -139,16 +136,18 @@ fun AddIncome(navController: NavHostController,
             Spacer(modifier = Modifier.size(4.dp))
             Text("Category", fontSize = 12.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.size(10.dp))
-            IncomeDropDown(listOf(
-                "Salary",
-                "Gift",
-                "Allowance",
-                "Repaid Debts",
-                "Side Job",
-                "Other"
-            ), onItemSelected = {
-                category.value=it
-            })
+            OutlinedTextField(value = category,
+                onValueChange = {category=it},
+                modifier = Modifier.fillMaxWidth(),
+                shape =  RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black,
+                    disabledBorderColor = Color.Black,
+                    disabledPlaceholderColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,))
             Spacer(modifier = Modifier.height(20.dp))
             Text("Amount", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
@@ -219,13 +218,10 @@ fun AddIncome(navController: NavHostController,
                 }
             }
             Spacer(modifier = Modifier.height(40.dp))
-            Button({ viewModel.addTransaction(amount = amount.toDouble(),
-                Category = category.toString(),
-                Type = transactionType,
-                date = selectedDate
-            )
-                Toast.makeText(context,"Transaction for ${transactionType} is successful", Toast.LENGTH_SHORT).show()
-                   navController.navigate(ROUTE_VIEW)}
+            Button({ var transactionRepository = TransactionModel(navController, context = context)
+                transactionRepository.saveTransaction(category.toString(), amount.toDouble(),type,selectedDate)
+                navController.navigate(ROUTE_VIEW)
+            }
 
             , modifier = Modifier.fillMaxWidth()) {
                 Text(" Add Income")
