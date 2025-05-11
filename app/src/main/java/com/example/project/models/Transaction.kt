@@ -13,4 +13,4 @@ data class Transaction(
     val Category:String,
     val Type: String
 ){
-constructor(amount: Double , Type:String,Category:String,date:String) :this(0,amount,Type,Cat,date)
+constructor(amount: Double , Type:String,Category:String,date:String) :this(0,amount,Type,Category,date)
