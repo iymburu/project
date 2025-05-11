@@ -1,5 +1,14 @@
 package com.example.project.ui.theme.screens.home
 
+import android.content.Context
+import android.os.Bundle
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,14 +50,54 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.project.Dao.TransactionDao
 import com.example.project.R
+import androidx.activity.viewModels
+import androidx.cardview.widget.CardView
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Dao
+import com.example.project.data.AppDatabase
+import com.example.project.data.TransactionModel
+import com.example.project.data.TransactionModelFactory
+import com.example.project.data.TransactionRepository
+import com.example.project.navigation.ROUTE_ADD
+import com.example.project.navigation.ROUTE_ADD_INCOME
 import com.example.project.navigation.ROUTE_HOME
+import com.example.project.navigation.ROUTE_VIEW
 import com.example.project.ui.theme.myblue
 import com.example.project.ui.theme.white
 import com.google.android.play.core.integrity.p
 
 @Composable
-fun Homescreen(navController: NavHostController) {
+fun Homescreen(navController: NavHostController,
+               viewModel: TransactionModel = hiltViewModel()
+)
+{
+
+
+
+    val balance by viewModel.balance.collectAsState(initial = 0.0)
+    var expanded by remember { mutableStateOf(false) }
+
 
     Surface(modifier = Modifier.fillMaxSize()) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
@@ -79,7 +128,7 @@ fun Homescreen(navController: NavHostController) {
 
                }
                Image(
-                   painter = painterResource(id = R.drawable.vert_menu), contentDescription ="menu", modifier = Modifier.align(Alignment.TopEnd)
+                   painter = painterResource(id = R.drawable.vert_menu), contentDescription ="menu", modifier = Modifier.align(Alignment.TopEnd).clickable { navController.navigate(ROUTE_VIEW) }
                , colorFilter = ColorFilter.tint(color = Color.White))
            }
 
@@ -95,49 +144,83 @@ fun Homescreen(navController: NavHostController) {
                 .height(200.dp)
                 .background(color = myblue, shape = RoundedCornerShape(16.dp))
                 .clip(shape = RoundedCornerShape(16.dp))) {
-                Box(modifier = Modifier.padding(top = 17.dp, start = 10.dp, end = 4.dp)){
-                    Text("Current Balance", fontSize = 20.sp, fontWeight = FontWeight.Medium , color = Color.White)
+                Column(modifier = Modifier.padding(top = 10.dp, start = 12.dp)) {
+                    Text("Current Balance", fontSize = 25.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                    Spacer(modifier = Modifier.height(15.dp))
+                Text(text = "Kshs:  ${balance?.toString() ?:"0.00"}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = white, modifier = Modifier.align(Alignment.CenterHorizontally))}
 
+            }
+            Column(modifier= Modifier
+                .constrainAs(list) {
+                    top.linkTo(card.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 }
-            }
-            Column(modifier= Modifier.constrainAs(list){
-                top.linkTo(card.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-                .height(250.dp)) {  }
+                .height(250.dp)) {
 
-            Box( modifier = Modifier.constrainAs(add) {
-                top.linkTo(list.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }.fillMaxWidth()
+            }
+
+            Box( modifier = Modifier
+                .constrainAs(add) {
+                    top.linkTo(list.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .fillMaxWidth()
                 .padding(end = 20.dp)
                 ) {
                 Column(modifier = Modifier.align (Alignment.CenterEnd)) {
-                    Button({}, modifier = Modifier.clip(shape = RoundedCornerShape(16.dp)).background(shape = RectangleShape, color = myblue),
+
+                    Button({expanded= !expanded}, modifier = Modifier
+                        .clip(shape = RoundedCornerShape(16.dp))
+                        .background(shape = RectangleShape, color = myblue),
                         colors = ButtonDefaults.buttonColors(myblue),
-                        ) {
+                    ) {
                         Text("+", fontSize = 20.sp, modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Add Income") },
+                            onClick = {
+                                navController.navigate(ROUTE_ADD_INCOME)
+                            })
+
+                        DropdownMenuItem(
+                            text = { Text("Add Expense") },
+                            onClick = {navController.navigate(ROUTE_ADD) }
+                        )
                     }
                 }
 
             }
-            Box( modifier = Modifier.constrainAs(bottom) {
-                top.linkTo(add.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }.fillMaxWidth()
+            Box( modifier = Modifier
+                .constrainAs(bottom) {
+                    top.linkTo(add.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(top = 30.dp)
-                .background(color = myblue, shape = RoundedCornerShape(15.dp))
+                .background(color = Color.Blue, shape = RoundedCornerShape(15.dp))
                 )
-                {Box(modifier = Modifier.padding(bottom = 54.dp).fillMaxWidth().height(54.dp).background(color = myblue, shape = RoundedCornerShape(6.dp))) {
-                    Column(modifier = Modifier.align (Alignment.CenterStart).padding(start = 54.dp) ){
+                {Box(modifier = Modifier
+                    .padding(bottom = 54.dp)
+                    .fillMaxWidth()
+                    .height(54.dp)
+                    .background(color = Color.Blue, shape = RoundedCornerShape(6.dp))) {
+                    Column(modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 54.dp) ){
                             Image(painter = painterResource(id=R.drawable.home), contentDescription = "home", colorFilter = ColorFilter.tint(color = Color.White), modifier = Modifier.clickable{navController.navigate(
                                 ROUTE_HOME
                             )})}
-                    Column(modifier = Modifier.align (Alignment.CenterEnd).padding(end = 54.dp) ){
+                    Column(modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 54.dp) ){
                         Image(painter = painterResource(id=R.drawable.graph_24), contentDescription = "graph", colorFilter = ColorFilter.tint(color = Color.White))
                         }}
 
@@ -146,14 +229,12 @@ fun Homescreen(navController: NavHostController) {
         }}
 
 }
-
-
-
-
-
 @Preview
 @Composable
-private fun Homescreen_Preview() {
+private fun Home_Screen(){
     Homescreen(rememberNavController())
-
 }
+
+
+
+

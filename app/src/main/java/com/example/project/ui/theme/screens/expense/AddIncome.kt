@@ -37,6 +37,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,24 +59,37 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.project.R
+import com.example.project.data.TransactionModel
 import com.example.project.navigation.ROUTE_HOME
 import com.example.project.ui.theme.myblue
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddIncome(navController : NavHostController) {
+fun AddIncome(navController: NavHostController,
+              viewModel: TransactionModel= hiltViewModel()) {
     val menuExpanded = remember { mutableStateOf(false) }
+//
+    val transactions by viewModel.allTransactions.collectAsState(initial = emptyList())
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillisToDate(it)
+    } ?: ""
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color.White)
     ){
-        val name = remember { mutableStateOf("") }
-        val amount = remember { mutableStateOf(TextFieldValue("")) }
-
-
+        val category = remember { mutableStateOf("") }
+        var amount by remember { mutableStateOf("") }
+        var transactionType by remember { mutableStateOf("income") }
         Box(modifier = Modifier
             .fillMaxWidth()
             .background(color = myblue)
@@ -87,18 +101,8 @@ fun AddIncome(navController : NavHostController) {
             Row { Text("               Add Income                           ", fontFamily = FontFamily.Cursive, fontSize = 30.sp,modifier = Modifier.background(color = myblue), color = Color.White)
 
             }
-            Image(painter=painterResource(id= R.drawable.back_arrow), contentDescription = "menu",modifier= Modifier
-                .clickable(onClick = { navController.navigate(ROUTE_HOME) })
-                .align(Alignment.TopStart)
-            )
 
-            Spacer(modifier= Modifier.width(90.dp))
-            Image(painter=painterResource(id= R.drawable.menu_icon), contentDescription = "menu",modifier= Modifier
-                .clickable {
-
-                }
-                .align(Alignment.TopEnd)
-            )
+            DropdownMenuWithDetails()
 
         }
         DropdownMenu(expanded = menuExpanded.value,
@@ -127,37 +131,24 @@ fun AddIncome(navController : NavHostController) {
                 )
         ) {
             Spacer(modifier = Modifier.size(4.dp))
-            Text("Name", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text("Category", fontSize = 12.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.size(10.dp))
             IncomeDropDown(listOf(
                 "Salary",
-                "Paypal",
-                "Debt",
-                "Side Job",
                 "Gift",
+                "Allowance",
+                "Repaid Debts",
+                "Side Job",
                 "Other"
             ), onItemSelected = {
-                name.value=it
+                category.value=it
             })
             Spacer(modifier = Modifier.height(20.dp))
             Text("Amount", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
-            OutlinedTextField(value = amount.value,
-                onValueChange = {},
-                textStyle = TextStyle(color = Color.Black),
-                visualTransformation = {text ->
-                    val out ="$" + text.text
-                    val currencyOffsetTranslator = object : OffsetMapping{
-                        override fun originalToTransformed(offset: Int): Int {
-                            return offset + 1
-                        }
+            OutlinedTextField(value = amount,
+                onValueChange = {amount=it},
 
-                        override fun transformedToOriginal(offset: Int): Int {
-                            return if(offset>0) offset - 1  else 0
-                        }
-                    }
-                    TransformedText(AnnotatedString(out),currencyOffsetTranslator)
-                },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) ,
                 shape =  RoundedCornerShape(8.dp),
@@ -172,15 +163,66 @@ fun AddIncome(navController : NavHostController) {
             Spacer(modifier = Modifier.height(20.dp))
             Text("Date", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
-            DatePickerDocked()
+            OutlinedTextField(
+                value = selectedDate,
+                onValueChange = { },
+                label = { Text("Select date") },
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = !showDatePicker }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .verticalScroll(rememberScrollState()),
+                shape =  RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
 
-            Spacer(modifier = Modifier.height(40.dp))
-            Button({/*TODO*/}, modifier = Modifier.fillMaxWidth()) {
-                Text(" Add Income ")
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black,
+                    disabledBorderColor = Color.Black,
+                    disabledPlaceholderColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black)
 
+            )
+
+            if (showDatePicker) {
+                Popup(
+                    onDismissRequest = { showDatePicker = false },
+                    alignment = Alignment.TopStart
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .offset(y = 23.dp)
+                            .shadow(elevation = 4.dp)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(13.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        DatePicker(
+                            state = datePickerState,
+                            showModeToggle = false
+                        )
+                    }
                 }
+            }
+            Spacer(modifier = Modifier.height(40.dp))
+            Button({ viewModel.addTransaction(amount = amount.toDouble(),
+                Category = category.toString(),
+                Type = transactionType,
+                date = selectedDate
+            )}
 
+            , modifier = Modifier.fillMaxWidth()) {
+                Text(" Add Income")
 
+            }
         }
 
     }
@@ -191,7 +233,7 @@ fun AddIncome(navController : NavHostController) {
 
 
 }
-
+    
 
 
 

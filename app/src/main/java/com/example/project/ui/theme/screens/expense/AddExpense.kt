@@ -56,6 +56,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -86,10 +87,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.project.R
+import com.example.project.data.TransactionModel
 import com.example.project.navigation.ROUTE_HOME
 import com.example.project.ui.theme.myblue
 import java.nio.file.WatchEvent
@@ -99,10 +103,18 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddExpenseScreen(navController: NavHostController) {
+fun AddExpenseScreen(navController: NavHostController,
+                     viewModel: TransactionModel= hiltViewModel()
+) {
+
     val menuExpanded = remember { mutableStateOf(false) }
 //
-
+    val transactions by viewModel.allTransactions.collectAsState(initial = emptyList())
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillisToDate(it)
+    } ?: ""
 
 
     Column(
@@ -110,10 +122,9 @@ fun AddExpenseScreen(navController: NavHostController) {
             .fillMaxSize()
             .background(color = Color.White)
             ){
-        val name = remember { mutableStateOf("") }
-        val amount = remember { mutableStateOf(TextFieldValue("")) }
-
-
+        val category = remember { mutableStateOf("") }
+        var amount by remember { mutableStateOf("") }
+        val type by remember { mutableStateOf("expense") }
         Box(modifier = Modifier
             .fillMaxWidth()
             .background(color = myblue)
@@ -125,12 +136,7 @@ fun AddExpenseScreen(navController: NavHostController) {
             Row { Text("               Add Expense                           ", fontFamily = FontFamily.Cursive, fontSize = 30.sp,modifier = Modifier.background(color = myblue), color = Color.White)
 
                 }
-                Image(painter=painterResource(id= R.drawable.back_arrow), contentDescription = "menu",modifier= Modifier
-                    .clickable { return@clickable }
-                    .align(Alignment.TopStart)
-                )
 
-                Spacer(modifier= Modifier.width(90.dp))
               DropdownMenuWithDetails()
 
         }
@@ -160,7 +166,7 @@ fun AddExpenseScreen(navController: NavHostController) {
             )
         ) {
             Spacer(modifier = Modifier.size(4.dp))
-            Text("Name", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text("Category", fontSize = 12.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.size(10.dp))
             ExpenseDropDown(listOf(
                 "Groceries",
@@ -173,27 +179,14 @@ fun AddExpenseScreen(navController: NavHostController) {
                 "Spotify",
                 "Other"
             ), onItemSelected = {
-                name.value=it
+                category.value=it
             })
             Spacer(modifier = Modifier.height(20.dp))
             Text("Amount", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
-            OutlinedTextField(value = amount.value,
-                onValueChange = {},
-                textStyle = TextStyle(color = Color.Black),
-                visualTransformation = {text ->
-                    val out ="$" + text.text
-                    val currencyOffsetTranslator = object : OffsetMapping{
-                        override fun originalToTransformed(offset: Int): Int {
-                            return offset + 1
-                        }
+            OutlinedTextField(value = amount,
+                onValueChange = {amount=it},
 
-                        override fun transformedToOriginal(offset: Int): Int {
-                            return if(offset>0) offset - 1  else 0
-                        }
-                    }
-                    TransformedText(AnnotatedString(out),currencyOffsetTranslator)
-                },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) ,
                 shape =  RoundedCornerShape(8.dp),
@@ -208,10 +201,62 @@ fun AddExpenseScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(20.dp))
             Text("Date", fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
-            DatePickerDocked()
+            OutlinedTextField(
+                value = selectedDate,
+                onValueChange = { },
+                label = { Text("Select date") },
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = !showDatePicker }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .verticalScroll(rememberScrollState()),
+                shape =  RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
 
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black,
+                    disabledBorderColor = Color.Black,
+                    disabledPlaceholderColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black)
+
+            )
+
+            if (showDatePicker) {
+                Popup(
+                    onDismissRequest = { showDatePicker = false },
+                    alignment = Alignment.TopStart
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .offset(y = 23.dp)
+                            .shadow(elevation = 4.dp)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(13.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        DatePicker(
+                            state = datePickerState,
+                            showModeToggle = false
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(40.dp))
-            Button({/*TODO*/}, modifier = Modifier.fillMaxWidth()) {
+            Button({viewModel.addTransaction(
+                amount = amount.toDouble(),
+                Category = category.toString(),
+                Type =type,
+                date = selectedDate
+            )}, modifier = Modifier.fillMaxWidth()) {
                 Text(" Add Expense ")
 
             }
@@ -234,8 +279,9 @@ fun DropdownMenuWithDetails() {
         modifier = Modifier
             .fillMaxWidth()
 
-    ) {
-        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.align (Alignment.TopEnd)) {
+
+    ) {Column(modifier = Modifier.align (Alignment.TopEnd)  ) {
+        IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")
         }
         DropdownMenu(
@@ -275,7 +321,7 @@ fun DropdownMenuWithDetails() {
                 text = { Text("Help") },
                 onClick = { /* Do something... */ }
             )
-        }
+        }}
     }
 }
 
@@ -287,15 +333,17 @@ fun ExpenseDropDown(listOfItems: List<String>,onItemSelected:(item: String )-> U
     ExposedDropdownMenuBox(
         expanded = expanded.value,
         onExpandedChange = { expanded.value = it }
-    ){
-        OutlinedTextField(value = ItemSelected.value,
-        onValueChange = {},
+    ) {
+        OutlinedTextField(
+            value = ItemSelected.value,
+            onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
             textStyle = TextStyle(color = Color.Black),
-            readOnly = true, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded=expanded.value)},
-           shape =  RoundedCornerShape(8.dp),
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+            shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
 
                 focusedBorderColor = Color.Black,
@@ -308,75 +356,11 @@ fun ExpenseDropDown(listOfItems: List<String>,onItemSelected:(item: String )-> U
         )
         ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = {}) {
             listOfItems.forEach {
-                DropdownMenuItem(text = {Text(text = it)}, onClick = {
-                    ItemSelected.value=it
+                DropdownMenuItem(text = { Text(text = it) }, onClick = {
+                    ItemSelected.value = it
                     onItemSelected(ItemSelected.value)
-                    expanded.value=false
+                    expanded.value = false
                 })
-            }
-        }
-    }
-
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDocked() {
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
-
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedDate,
-            onValueChange = { },
-            label = { Text("Select date") },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Select date"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .verticalScroll(rememberScrollState()),
-            shape =  RoundedCornerShape(8.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                disabledBorderColor = Color.Black,
-                disabledPlaceholderColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black)
-
-        )
-
-        if (showDatePicker) {
-            Popup(
-                onDismissRequest = { showDatePicker = false },
-                alignment = Alignment.TopStart
-            ) {
-                Box(
-                    modifier = Modifier
-                        .offset(y = 23.dp)
-                        .shadow(elevation = 4.dp)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(13.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    DatePicker(
-                        state = datePickerState,
-                        showModeToggle = false
-                    )
-                }
             }
         }
     }
