@@ -10,7 +10,7 @@ import com.example.project.models.Transaction
 
 
 
-@Database(entities = [Transaction::class], version = 1)
+@Database(entities = [Transaction::class], version = 2, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
 

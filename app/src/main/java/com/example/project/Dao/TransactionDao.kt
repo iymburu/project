@@ -15,11 +15,9 @@ interface TransactionDao {
     suspend fun insert(transaction: Transaction)
 
     @Query("SELECT * FROM transactions ORDER BY date Desc")
-    fun getAllTransactions(): Flow<List<Transaction>>
+      fun getAllTransactions(): Flow<List<Transaction>>
     @Query("SELECT * FROM transactions WHERE Type = 'Expense' ORDER BY amount DESC LIMIT 5")
     fun getTopExpenses(): Flow<List<Transaction>>
-    @Insert
-    suspend fun insertExpense(transaction: Transaction)
 
     @Delete
     suspend fun deleteExpense(transaction: Transaction)
@@ -31,7 +29,7 @@ interface TransactionDao {
         """
         SELECT COALESCE(
         SUM
-        (CASE WHEN Type ="income" THEN  amount
+        (CASE WHEN Type ="income" THEN  +amount
         WHEN Type ="expense" THEN -amount
         ELSE 0 END ),0.0)FROM transactions
    """

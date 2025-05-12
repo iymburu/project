@@ -254,7 +254,7 @@ fun AddExpenseScreen(navController: NavHostController,
             Button({viewModel.addTransaction(
                 amount = amount.toDouble(),
                 Category = category.toString(),
-                Type =type,
+                Type = "expense",
                 date = selectedDate
             )}, modifier = Modifier.fillMaxWidth()) {
                 Text(" Add Expense ")

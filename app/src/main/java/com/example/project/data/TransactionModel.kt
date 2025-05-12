@@ -30,15 +30,21 @@ class TransactionModel @Inject constructor(private val repository: TransactionRe
 
     fun addTransaction(amount: Double, Type:String, Category: String, date:String){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addTransaction(
-                Transaction(
+            try {
+                val transaction= Transaction(
                     amount = amount,
                     Type = Type,
                     Category = Category,
                     date = date
-
                 )
-            )
+                repository.addTransaction(transaction)
+
+
+            }
+            catch (e: Exception){
+                ("Transaction Error")
+            }
+
         }
     }
 
@@ -58,11 +64,10 @@ class TransactionRepository @Inject constructor(private val transactionDao: Tran
         initialValue = 0.0)
 
     suspend fun addTransaction(transaction: Transaction){
-        withContext (Dispatchers.IO){
-            transactionDao.insert(transaction)
+        transactionDao.insert(transaction)
         }
     }
-}
+
 
 class TransactionModelFactory(
     private val repository: TransactionRepository

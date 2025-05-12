@@ -1,5 +1,6 @@
 package com.example.project.ui.theme.screens.expense
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -66,11 +68,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.project.R
 import com.example.project.data.TransactionModel
 import com.example.project.navigation.ROUTE_HOME
+import com.example.project.navigation.ROUTE_VIEW
 import com.example.project.ui.theme.myblue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddIncome(navController: NavHostController,
+              defaultType: String ="income",
               viewModel: TransactionModel= hiltViewModel()) {
     val menuExpanded = remember { mutableStateOf(false) }
 //
@@ -80,6 +84,8 @@ fun AddIncome(navController: NavHostController,
     val selectedDate = datePickerState.selectedDateMillis?.let {
         convertMillisToDate(it)
     } ?: ""
+    val context= LocalContext.current
+
 
 
     Column(
@@ -89,7 +95,7 @@ fun AddIncome(navController: NavHostController,
     ){
         val category = remember { mutableStateOf("") }
         var amount by remember { mutableStateOf("") }
-        var transactionType by remember { mutableStateOf("income") }
+        var transactionType by remember { mutableStateOf(defaultType) }
         Box(modifier = Modifier
             .fillMaxWidth()
             .background(color = myblue)
@@ -217,7 +223,9 @@ fun AddIncome(navController: NavHostController,
                 Category = category.toString(),
                 Type = transactionType,
                 date = selectedDate
-            )}
+            )
+                Toast.makeText(context,"Transaction for ${transactionType} is successful", Toast.LENGTH_SHORT).show()
+                   navController.navigate(ROUTE_VIEW)}
 
             , modifier = Modifier.fillMaxWidth()) {
                 Text(" Add Income")
