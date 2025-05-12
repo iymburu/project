@@ -32,7 +32,8 @@ interface TransactionDao {
         SELECT COALESCE(
         SUM
         (CASE WHEN Type ="income" THEN  amount
-        ELSE +amount END ),0.0)FROM transactions
+        WHEN Type ="expense" THEN -amount
+        ELSE 0 END ),0.0)FROM transactions
    """
     )
     fun getCurrentBalance(): Flow<Double>
