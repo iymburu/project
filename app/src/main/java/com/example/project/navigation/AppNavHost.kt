@@ -20,13 +20,14 @@ import com.example.project.ui.theme.screens.expense.AddIncome
 import com.example.project.ui.theme.screens.expense.ViewTransactions
  import com.example.project.ui.theme.screens.home.Homescreen
 import com.example.project.ui.theme.screens.login.Loginscreen
+import com.example.project.ui.theme.screens.profile.ProfileScreen
 import com.example.project.ui.theme.screens.register.RegisterScreen
 import com.example.project.ui.theme.screens.stats.TransactionPieChartScreen
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier,
                navController: NavHostController= rememberNavController(),
-               startDestination:String= ROUTE_HOME) {
+               startDestination:String= ROUTE_LOGIN) {
     NavHost(navController = navController, modifier = modifier, startDestination = startDestination) {
         composable(ROUTE_LOGIN){
             Loginscreen(navController)
@@ -48,6 +49,9 @@ fun AppNavHost(modifier: Modifier = Modifier,
         }
         composable(ROUTE_CHART) {
             TransactionPieChartScreen(navController)
+        }
+        composable(ROUTE_PROFILE){
+            ProfileScreen(navController)
         }
 
     }

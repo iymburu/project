@@ -78,6 +78,7 @@ import com.example.project.navigation.ROUTE_ADD
 import com.example.project.navigation.ROUTE_ADD_INCOME
 import com.example.project.navigation.ROUTE_CHART
 import com.example.project.navigation.ROUTE_HOME
+import com.example.project.navigation.ROUTE_PROFILE
 import com.example.project.navigation.ROUTE_VIEW
 import com.example.project.ui.theme.myblue
 import com.example.project.ui.theme.white
@@ -124,12 +125,13 @@ fun Homescreen(navController: NavHostController,
 
                }
                Image(
-                   painter = painterResource(id = R.drawable.account), contentDescription ="menu", modifier = Modifier.align(Alignment.TopEnd).clickable { navController.navigate(ROUTE_VIEW) }
+                   painter = painterResource(id = R.drawable.account), contentDescription ="menu", modifier = Modifier.align(Alignment.TopEnd).clickable { navController.navigate(
+                       ROUTE_PROFILE) }
                , colorFilter = ColorFilter.tint(color = Color.White))
            }
 
 
-            Column(modifier= Modifier.padding(start = 20.dp,end=20.dp)
+            Column(modifier= Modifier.padding(start = 30.dp,end=30.dp)
                 .constrainAs(list) {
                     top.linkTo(topBar.bottom)
                     start.linkTo(parent.start)
@@ -137,7 +139,7 @@ fun Homescreen(navController: NavHostController,
                 }
                 .height(450.dp)) {
                 Spacer(modifier = Modifier.height(60.dp))
-                Button({ROUTE_ADD_INCOME}, modifier = Modifier.fillMaxWidth()
+                Button({navController.navigate(ROUTE_ADD_INCOME)}, modifier = Modifier.fillMaxWidth()
                     .clip(shape = RoundedCornerShape(16.dp))
                     .background(shape = RectangleShape, color = myblue),
                     colors = ButtonDefaults.buttonColors(myblue),

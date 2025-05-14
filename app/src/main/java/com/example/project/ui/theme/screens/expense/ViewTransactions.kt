@@ -54,7 +54,6 @@ import com.example.project.data.TransactionModel
 import com.example.project.models.Transaction
 import com.example.project.navigation.ROUTE_CHART
 import com.example.project.navigation.ROUTE_HOME
-import com.example.project.navigation.ROUTE_UPDATE
 import com.example.project.ui.theme.myblue
 import com.example.project.ui.theme.white
 
@@ -91,7 +90,7 @@ LaunchedEffect(Unit) {
                 Image(painter = painterResource(id=R.drawable.home), contentDescription = "home", colorFilter = ColorFilter.tint(color = Color.White), modifier = Modifier.clickable{navController.navigate(
                     ROUTE_HOME
                 )})}
-                Spacer(modifier.width(60.dp))
+                Spacer(modifier.width(200.dp))
                 Column(modifier = Modifier
                      .padding(end = 54.dp) ){
                     Image(painter = painterResource(id=R.drawable.graph_24), contentDescription = "graph", colorFilter = ColorFilter.tint(color = Color.White), modifier = Modifier.clickable { navController.navigate(
