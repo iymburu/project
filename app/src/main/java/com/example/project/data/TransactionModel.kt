@@ -9,7 +9,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavHostController
 import com.example.project.models.Transaction
+import com.example.project.models.User
 import com.example.project.navigation.ROUTE_LOGIN
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 
@@ -20,6 +23,8 @@ class TransactionModel(
 ){
     var authRepository: AuthViewModel
     var progress: ProgressDialog
+    val currentUser= FirebaseAuth.getInstance().currentUser
+    val userId= currentUser?.uid
 
     init {
         authRepository = AuthViewModel(navController, context)
@@ -31,11 +36,12 @@ class TransactionModel(
         progress.setMessage("Please wait...")
     }
     fun saveTransaction(category:String,amount :Double,type:String,selectedDate:String){
+
         var id = System.currentTimeMillis().toString()
         var total = 0.0
         var TransactionData = Transaction(amount, type,category,selectedDate, id)
         var TransactionRef = FirebaseDatabase.getInstance().getReference()
-            .child("Transactions/$id")
+            .child("Users/$userId/Transactions/$id")
         progress.show()
         TransactionRef.setValue(TransactionData).addOnCompleteListener {
             progress.dismiss()
@@ -49,7 +55,7 @@ class TransactionModel(
     }
     fun deleteProduct(id: String) {
         var delRef = FirebaseDatabase.getInstance().getReference()
-            .child("Transactions/$id")
+            .child("Users/$userId/Transactions/$id")
         progress.show()
         delRef.removeValue().addOnCompleteListener {
             progress.dismiss()
@@ -68,7 +74,7 @@ class TransactionModel(
         selectedDate:String,
         id: String) {
         var updateRef = FirebaseDatabase.getInstance().getReference()
-            .child("Transactions/$id")
+            .child("Users/$userId/Transactions/$id")
         progress.show()
         var updateData = Transaction(amount,category,type,selectedDate , id)
         updateRef.setValue(updateData).addOnCompleteListener {
@@ -83,7 +89,7 @@ class TransactionModel(
     fun viewTransaction(
         transactions: SnapshotStateList<Transaction>
     ): SnapshotStateList<Transaction> {
-        val ref = FirebaseDatabase.getInstance().getReference().child("Transactions")
+        val ref = FirebaseDatabase.getInstance().getReference().child("Users/$userId/Transactions")
 
         progress.show()
         ref.addValueEventListener(object : ValueEventListener {

@@ -25,6 +25,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButtonDefaults.colors
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -81,15 +83,30 @@ fun Loginscreen(navController: NavHostController) {
             value = email,
             onValueChange = { email = it },
             label = { Text("Enter your email", color = Color.White) },
-            leadingIcon = {Icon(Icons.Default.Email, contentDescription = "email")},
+            leadingIcon = {Icon(Icons.Default.Email, contentDescription = "email")} ,
+            colors = OutlinedTextFieldDefaults.colors(
 
-            )
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Black,
+                disabledPlaceholderColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,))
+
+
         Spacer(modifier= Modifier.height(23.dp))
         OutlinedTextField(
             value = pass,
             onValueChange = { pass = it },
             label = { Text("Enter your password ", color = Color.White) },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) }
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Black,
+            unfocusedBorderColor = Color.Black,
+            disabledBorderColor = Color.Black,
+            disabledPlaceholderColor = Color.Black,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,)
         )
         Spacer(modifier= Modifier.height(20.dp))
         Button({val mylogin= AuthViewModel(navController,context)

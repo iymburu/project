@@ -101,7 +101,7 @@ fun AddExpenseScreen(navController: NavHostController,
 
                 }
 
-              DropdownMenuWithDetails()
+
 
         }
         DropdownMenu(expanded = menuExpanded.value,
@@ -254,35 +254,9 @@ fun DropdownMenuWithDetails() {
             DropdownMenuItem(
                 text = { Text("Profile") },
                 leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
-                onClick = { /* Do something... */ }
-            )
-            DropdownMenuItem(
-                text = { Text("Settings") },
-                leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                onClick = { /* Do something... */ }
+                onClick = {}
             )
 
-            HorizontalDivider()
-
-            // Second section
-            DropdownMenuItem(
-                text = { Text("Send Feedback") },
-                trailingIcon = { Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null) },
-                onClick = { /* Do something... */ }
-            )
-
-            HorizontalDivider()
-
-            // Third section
-            DropdownMenuItem(
-                text = { Text("About") },
-                leadingIcon = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                onClick = { /* Do something... */ }
-            )
-            DropdownMenuItem(
-                text = { Text("Help") },
-                onClick = { /* Do something... */ }
-            )
         }}
     }
 }

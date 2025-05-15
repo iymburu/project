@@ -68,7 +68,7 @@ fun TransactionPieChartScreen(navController:NavHostController) {
         try {
             currentUser?.uid?.let { uid ->
                 val database = Firebase.database
-                val transactionsRef = database.getReference("Transactions")
+                val transactionsRef = database.getReference("Users/$uid/Transactions")
 
                 transactionsRef.addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {

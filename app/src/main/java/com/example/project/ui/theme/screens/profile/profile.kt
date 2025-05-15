@@ -131,7 +131,7 @@ fun ProfileScreen(navController: NavHostController) {
                             authLog.logout()
                         })
                 }
-                Column(modifier = Modifier.background(color=Color.White).constrainAs(list) {
+                Column(modifier = Modifier.constrainAs(list) {
                     top.linkTo(topBar.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -147,7 +147,7 @@ fun ProfileScreen(navController: NavHostController) {
                                 contentDescription = "account"
                             )
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().background(color=Color.White, shape = RoundedCornerShape(8.dp)),
                         shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
 
@@ -166,7 +166,7 @@ fun ProfileScreen(navController: NavHostController) {
                         value = userEmail, onValueChange = {},
                         readOnly = true,
                         leadingIcon = { Icon(Icons.Default.Email, contentDescription = "email") },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().background(color=Color.White, shape = RoundedCornerShape(8.dp)),
                         shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
 

@@ -24,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -78,6 +79,14 @@ fun RegisterScreen(navController: NavHostController) {
             onValueChange = { email = it },
             label = { Text("Enter your email", color = Color.DarkGray) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = "email") },
+            colors = OutlinedTextFieldDefaults.colors(
+
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Black,
+                disabledPlaceholderColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,)
 
                 
             )
@@ -90,6 +99,14 @@ fun RegisterScreen(navController: NavHostController) {
             onValueChange = { username = it },
             label = { Text("Enter your username", color = Color.DarkGray) },
             leadingIcon = { Icon(Icons.Default.AccountCircle, contentDescription = "username") },
+            colors = OutlinedTextFieldDefaults.colors(
+
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Black,
+                disabledPlaceholderColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,)
 
 
             )
@@ -101,6 +118,14 @@ fun RegisterScreen(navController: NavHostController) {
             onValueChange = { pass = it },
             label = { Text("Enter your password", color = Color.DarkGray) },
             leadingIcon = {Icon(Icons.Default.Lock, contentDescription = "pass")},
+            colors = OutlinedTextFieldDefaults.colors(
+
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Black,
+                disabledPlaceholderColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,)
 
             )
         Spacer(modifier = Modifier.height(20.dp))
@@ -110,6 +135,14 @@ fun RegisterScreen(navController: NavHostController) {
             onValueChange = { confpass = it },
             label = { Text("Confirm your password", color = Color.DarkGray) },
             leadingIcon = {Icon(Icons.Default.Lock, contentDescription = "confpass")},
+            colors = OutlinedTextFieldDefaults.colors(
+
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor = Color.Black,
+                disabledPlaceholderColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,)
 
             )
         Spacer(modifier = Modifier.height(20.dp))

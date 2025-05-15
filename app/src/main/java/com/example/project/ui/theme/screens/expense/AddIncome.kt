@@ -104,9 +104,6 @@ fun AddIncome(navController: NavHostController,
             Row { Text("               Add Income                           ", fontFamily = FontFamily.Cursive, fontSize = 30.sp,modifier = Modifier.background(color = myblue), color = Color.White)
 
             }
-
-            DropdownMenuWithDetails()
-
         }
         DropdownMenu(expanded = menuExpanded.value,
             onDismissRequest = {menuExpanded.value= false}) {
@@ -134,7 +131,7 @@ fun AddIncome(navController: NavHostController,
                 )
         ) {
             Spacer(modifier = Modifier.size(4.dp))
-            Text("Category", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text("Category",  fontSize = 12.sp, color = Color.Black)
             Spacer(modifier = Modifier.size(10.dp))
             OutlinedTextField(value = category,
                 onValueChange = {category=it},
